@@ -1,18 +1,30 @@
 package initialize
 
 import (
+	"cloud_storage/handler"
 	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
 	"net/http"
 )
 
 func Routers() *gin.Engine {
+	zap.S().Debugf("初始化路由器")
 	Router := gin.Default()
-	Router.GET("/", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{
-			"code":    http.StatusOK,
-			"success": true,
-		})
-	})
+	fileGroup := Router.Group("/file")
+	{
+		fileGroup.GET("/upload", handler.UploadHandler)
+		fileGroup.POST("/upload", handler.UploadHandler)
+		fileGroup.POST("/meta", handler.GetFileMetaHandler)
+		fileGroup.POST("update", hander.Upda)
+	}
+	userGroup := Router.Group("/user")
+	{
+		userGroup.GET("/signup", handler.SignupHandler)
+		userGroup.POST("/signup", handler.SignupHandler)
+		userGroup.GET("/login", handler.LoginHandler)
+		userGroup.POST("/login", handler.LoginHandler)
+		userGroup.POST("/userinfo", handler.UserInfoHandler)
+	}
 
 	Router.Use(Cors())
 	return Router

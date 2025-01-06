@@ -1,19 +1,19 @@
 package main
 
 import (
-	"cloud_storage/handler"
-	"github.com/gin-gonic/gin"
+	"cloud_storage/global"
+	"cloud_storage/initialize"
+	"fmt"
+	"go.uber.org/zap"
 )
 
 func main() {
-	router := gin.Default()
+	initialize.InitLogger()
+	initialize.InitConfig()
+	router := initialize.Routers()
 	router.LoadHTMLGlob("static/view/*")
-	router.GET("/file/upload", handler.UploadHandler)
-	router.POST("/file/upload", handler.UploadHandler)
-	router.Run(":8080")
-	//http.HandleFunc("/file/upload", handler.UploadHandler)
-	//err := http.ListenAndServe(":8080", nil)
-	//if err != nil {
-	//	fmt.Printf("Fail to start server, err%s", err.Error())
-	//}
+	zap.S().Debugf("启动服务器, 端口： %d", global.ServerConfig.Port)
+	if err := router.Run(fmt.Sprintf(":%d", global.ServerConfig.Port)); err != nil {
+		zap.S().Panic("启动失败:", err.Error())
+	}
 }
